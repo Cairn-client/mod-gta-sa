@@ -50198,7 +50198,7 @@ FIRETRU_9212()
 //-------------Mission 15---------------
 
 :COPCAR
-COPCAR_52()
+COPCAR_START()
 00D6: if 
 0112:   wasted_or_busted // mission only 
 004D: jump_if_false @COPCAR_43 
@@ -50206,10 +50206,10 @@ COPCAR_52()
 COPCAR_14808()
 
 :COPCAR_43
-COPCAR_14810()
+COPCAR_CLEANUP()
 004E: terminate_this_script 
 
-:COPCAR_52
+:COPCAR_START
 0004: $ONMISSION = 1 
 03A4: script_name 'COPCAR' 
 0001: wait 0 ms 
@@ -52799,7 +52799,7 @@ COPCAR_15328()
 :COPCAR_14808
 0051: return 
 
-:COPCAR_14810
+:COPCAR_CLEANUP
 0004: $ONMISSION = 0 
 0164: disable_marker 92@ 
 0164: disable_marker 93@ 
