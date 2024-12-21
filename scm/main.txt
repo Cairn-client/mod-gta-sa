@@ -511,7 +511,8 @@ DEFINE UNKNOWN_THREADS_MEMORY 0
 
 
 //-------------MAIN---------------
-03A4: script_name 'MAIN' 
+03A4: script_name 'MAIN'
+0F00: coop_add_chat_message 'Hello!'
 004F: start_new_script @INTMAN 
 004F: start_new_script @GYM 
 004F: start_new_script @CRANES 
