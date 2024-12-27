@@ -574,18 +574,20 @@ DEFINE UNKNOWN_THREADS_MEMORY 0
 01E8: create_forbidden_for_cars_cube_cornerA -1761.95 507.8931 35.0533 cornerB -1751.36 531.5917 41.3335 
 0004: $LOWR_CONT_SCRIPT_LAUNCHED = 0 
 0180: set_on_mission_flag_to $ONMISSION // Note: your missions have to use the variable defined here 
-0629: change_integer_stat 65 to 1000 
-062A: change_float_stat 69 to 1000.0 
-062A: change_float_stat 70 to 1000.0 
-062A: change_float_stat 71 to 1000.0 
-062A: change_float_stat 72 to 1000.0 
-062A: change_float_stat 73 to 1000.0 
-062A: change_float_stat 74 to 1000.0 
-062A: change_float_stat 75 to 1000.0 
-062A: change_float_stat 76 to 1000.0 
-062A: change_float_stat 77 to 1000.0 
-062A: change_float_stat 78 to 1000.0 
-062A: change_float_stat 79 to 1000.0 
+0629: change_integer_stat 65 to 1000
+// weapon stats
+//062A: change_float_stat 69 to 1000.0 
+//062A: change_float_stat 70 to 1000.0 
+//062A: change_float_stat 71 to 1000.0 
+//062A: change_float_stat 72 to 1000.0 
+//062A: change_float_stat 73 to 1000.0 
+//062A: change_float_stat 74 to 1000.0 
+//062A: change_float_stat 75 to 1000.0 
+//062A: change_float_stat 76 to 1000.0 
+//062A: change_float_stat 77 to 1000.0 
+//062A: change_float_stat 78 to 1000.0 
+//062A: change_float_stat 79 to 1000.0
+ 
 0629: change_integer_stat 181 to 1 
 0629: change_integer_stat 181 to 1 
 0629: change_integer_stat 181 to 2 
