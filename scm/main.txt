@@ -425,11 +425,11 @@ DEFINE MISSION 30 AT @BCOUR
 DEFINE MISSION 31 AT @MTBIKER         
 DEFINE MISSION 32 AT @STUNT           
 
-DEFINE EXTERNAL_SCRIPTS 78 // Use -1 in order not to compile AAA script
+DEFINE EXTERNAL_SCRIPTS 77 // Use -1 in order not to compile AAA script
 DEFINE SCRIPT PLAYER_PARACHUTE AT @PLCHUTE // 0
 DEFINE SCRIPT PARACHUTE AT @PARACH     // 1
 DEFINE SCRIPT BCESAR2 AT @BCESAR2      // 2
-DEFINE SCRIPT BCESAR3 AT @COKEC        // 3
+//DEFINE SCRIPT BCESAR3 AT @COKEC        // 3
 DEFINE SCRIPT SLOT_MACHINE AT @BANDIT  // 4
 DEFINE SCRIPT ROULETTE AT @ROULETE     // 5
 DEFINE SCRIPT OTB_SCRIPT AT @OTB_MSC   // 6
@@ -512,7 +512,7 @@ DEFINE UNKNOWN_THREADS_MEMORY 0
 
 //-------------MAIN---------------
 03A4: script_name 'MAIN'
-0F00: coop_add_chat_message 'Hello!'
+//0F00: coop_add_chat_message 'Hello!'
 004F: start_new_script @INTMAN 
 004F: start_new_script @GYM 
 004F: start_new_script @CRANES 
@@ -114244,7 +114244,7 @@ PARACH_6417()
 0002: jump @COKEC_74 
 
 :COKEC_333
-0050: gosub 99487 
+//0050: gosub 99487 
 00D6: if 
 0038:   $TIME_FROM_LAST_CALL_GOT_FLAG == 0 
 004D: jump_if_false @COKEC_369 
