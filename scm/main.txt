@@ -612,7 +612,7 @@ DEFINE UNKNOWN_THREADS_MEMORY 574
 
 {$USE CoopAndreas}
 {$USE debug}
-{$USE CLEO}
+
 var
 $NETWORK_PLAYER: array 3 of integer
 $NETWORK_PLAYER_VEHICLE: array 3 of integer
