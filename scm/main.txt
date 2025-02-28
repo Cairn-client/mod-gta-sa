@@ -54443,8 +54443,10 @@ FOR $temp_int = 0 to 2
     then
         if not Char.IsInCar($NETWORK_PLAYER[$temp_int], $NETWORK_PLAYER_VEHICLE[$temp_int])
         then
+            Coop.PrintNowForNetworkPlayer('INTRO2K', 1000, 1, $NETWORK_PLAYER[$temp_int])
             203@($temp_int, 3i) = 0
         else
+            Coop.PrintNowForNetworkPlayer('INTRO2E', 1000, 1, $NETWORK_PLAYER[$temp_int])
             203@($temp_int, 3i) = 1
         end
     end
@@ -55654,6 +55656,14 @@ Audio.PlayMissionPassedTune(1)
 Stat.PlayerMadeProgress(1)
 Blip.Remove($intro_contact_blip)
 World.SwitchEntryExit('CARLS', True)
+FOR $temp_int = 0 to 2
+    if Coop.IsNetworkPlayerActorValid($NETWORK_PLAYER[$temp_int])
+    then
+        Coop.ClearAllEntityBlipsForNetworkPlayer($NETWORK_PLAYER[$temp_int])
+        Coop.RemoveCheckpointForNetworkPlayer($NETWORK_PLAYER[$temp_int])
+        $NETWORK_PLAYER[$temp_int] = 0
+    end
+end
 return 
 
 :INTRO1_19795
