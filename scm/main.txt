@@ -612,6 +612,8 @@ DEFINE UNKNOWN_THREADS_MEMORY 574
 
 {$USE CoopAndreas}
 {$USE debug}
+/*{$USE CLEO}
+{$USE CLEO+}*/
 
 var
 $NETWORK_PLAYER: array 3 of integer
@@ -7067,7 +7069,9 @@ goto_if_false @INTROST_848
 terminate_all_scripts_with_this_name 'INT'
 start_new_script @INT 
 Blip.Remove($intro_contact_blip)
+
 $intro_contact_blip = Blip.AddSpriteForContactPoint($ryder_blip_icon, $ryderX, $ryderY, $ryderZ)
+
 Text.PrintNow('INT2_1', 8000, 1)
 wait 2000
 Text.PrintHelp('RYBLIP')
@@ -27499,7 +27503,12 @@ Path.SwitchRoadsOff(-1737.333, 455.9431, 30.3573, -1710.363, 500.6261, 40.4891)
 Path.SwitchRoadsOff(-1689.229, 513.0995, 30.2597, -1679.124, 524.8383, 40.25)
 Path.SwitchRoadsOff(-1742.906, 500.7302, 30.4679, -1650.312, 551.8201, 40.7455)
 Text.ClearPrints
-$intro_contact_blip = Blip.AddSpriteForCoord($intro_blip_icon, $introX, $introY, $introZ)
+
+if Coop.IsHost() 
+then
+    $intro_contact_blip = Blip.AddSpriteForCoord($intro_blip_icon, $introX, $introY, $introZ)
+end
+
 World.SwitchEntryExit('CARLS', False)
 World.SwitchEntryExit('AMMUN1', False)
 World.SwitchEntryExit('AMMUN2', False)
@@ -28697,7 +28706,12 @@ Path.SwitchRoadsOff(-1737.333, 455.9431, 30.3573, -1710.363, 500.6261, 40.4891)
 Path.SwitchRoadsOff(-1689.229, 513.0995, 30.2597, -1679.124, 524.8383, 40.25)
 Path.SwitchRoadsOff(-1742.906, 500.7302, 30.4679, -1650.312, 551.8201, 40.7455)
 Text.ClearPrints
-$intro_contact_blip = Blip.AddSpriteForCoord($intro_blip_icon, $introX, $introY, $introZ)
+
+if Coop.IsHost() 
+then
+    $intro_contact_blip = Blip.AddSpriteForCoord($intro_blip_icon, $introX, $introY, $introZ)
+end
+
 World.SwitchEntryExit('CARLS', False)
 World.SwitchEntryExit('AMMUN1', False)
 World.SwitchEntryExit('AMMUN2', False)
@@ -28906,7 +28920,12 @@ start_new_script @MOB_RAN
 terminate_all_scripts_with_this_name 'INTROST'
 start_new_script @INTROST 
 Blip.Remove($intro_contact_blip)
-$intro_contact_blip = Blip.AddSpriteForContactPoint($intro_blip_icon, $introX, $introY, $introZ)
+
+if Coop.IsHost() 
+then
+    $intro_contact_blip = Blip.AddSpriteForContactPoint($intro_blip_icon, $introX, $introY, $introZ)
+end
+
 Streaming.MarkModelAsNoLongerNeeded(481)
 if 
   not Car.IsDead($intro_bmx)
@@ -53740,10 +53759,24 @@ if or
   150@ == 0
 goto_if_false @INTRO1_10022
 wait 0
-if 
-is_ps2_keyboard_key_pressed 83
-goto_if_false @INTRO1_8223
-Char.SetCoordinates($scplayer, 2473.692, -1684.215, 12.4625)
+
+// SKIP MISSION
+/*if and
+    Pad.IsKeyPressed(KeyCode.Shift)
+    Pad.IsKeyJustPressed(KeyCode.M)
+then
+    FOR $temp_int = 0 to 2
+        if
+            Coop.IsNetworkPlayerActorValid($NETWORK_PLAYER[$temp_int])
+        then
+            Char.SetCoordinates($NETWORK_PLAYER[$temp_int], 2473.692, -1684.215, 12.4625)
+        end
+    end
+    Char.SetCoordinates($scplayer, 2473.692, -1684.215, 12.4625)
+    goto_if_false @INTRO1_8223
+end*/
+
+
 goto @INTRO1_19683
 
 :INTRO1_8223
@@ -58772,10 +58805,15 @@ Text.PrintWithNumberBig('M_PASSR', 3, 5000, TextStyle.Middle)
 Stat.AwardPlayerMissionRespect(3)
 CarGenerator.Switch($gen_car6, 101)
 $flag_intro_mission_counter += 1
+
 Blip.Remove($intro_contact_blip)
+
 start_new_script @SWEET 
+
 Blip.Remove($sweet_contact_blip)
+
 $sweet_contact_blip = Blip.AddSpriteForContactPoint($sweet_blip_icon, $sweetX, $sweetY, $sweetZ)
+
 Player.ClearWantedLevel($player1)
 World.SwitchEntryExit('BARBERS', True)
 World.SwitchEntryExit('BARBER2', True)
