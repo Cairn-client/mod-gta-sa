@@ -612,8 +612,8 @@ DEFINE UNKNOWN_THREADS_MEMORY 574
 
 {$USE CoopAndreas}
 {$USE debug}
-/*{$USE CLEO}
-{$USE CLEO+}*/
+{$USE CLEO}
+{$USE CLEO+}
 
 var
 $NETWORK_PLAYER: array 3 of integer
@@ -52767,6 +52767,21 @@ Char.SetCoordinates($scplayer, 2495.59, -1686.96, 12.51)
 Task.StandStill($scplayer, 1)
 Char.SetHeading($scplayer, 32.0)
 Char.ClearTasksImmediately($scplayer)
+
+// waiting for the server to create the vehicles
+while true
+    wait 0
+    $temp_int = Coop.GetVehicleNetworkId(41@)
+    86@ = Coop.GetPedNetworkId($big_smoke)
+    
+    if and
+        $temp_int <> -1 
+        86@ <> -1
+    then
+        break
+    end
+end
+
 Char.SetNextDesiredMoveState(MoveState.Walk)
 Task.EnterCarAsPassenger($big_smoke, 41@, 0, 10000)
 Char.SetNextDesiredMoveState(MoveState.Walk)
@@ -53761,7 +53776,7 @@ goto_if_false @INTRO1_10022
 wait 0
 
 // SKIP MISSION
-/*if and
+if and
     Pad.IsKeyPressed(KeyCode.Shift)
     Pad.IsKeyJustPressed(KeyCode.M)
 then
@@ -53773,11 +53788,9 @@ then
         end
     end
     Char.SetCoordinates($scplayer, 2473.692, -1684.215, 12.4625)
-    goto_if_false @INTRO1_8223
-end*/
-
-
-goto @INTRO1_19683
+    goto @INTRO1_19683
+end
+//goto @INTRO1_19683
 
 :INTRO1_8223
 gosub @INTRO1_20067
@@ -56588,6 +56601,8 @@ return
 
 :INTRO2
 script_name 'INTRO2'
+Coop.EnableSyncingThisScript()
+
 gosub @INTRO2_908
 if 
   has_deatharrest_been_executed 
@@ -56692,6 +56707,13 @@ return
 
 :INTRO2_908
 Stat.RegisterMissionGiven
+$NETWORK_PLAYER[0], $NETWORK_PLAYER[1], $NETWORK_PLAYER[2] = Coop.CollectNetworkPlayersForTheMission()
+
+CarGenerator.Switch($gen_car6, 0)
+CarGenerator.Switch($gen_car7, 0)
+World.ClearArea(1, $ryder_carX, $ryder_carY, $ryder_carZ, 10.0)
+World.ClearArea(1, $sweet_carX, $sweet_carY, $sweet_carZ, 10.0)
+
 $onmission = 1
 36@ = 0
 38@ = 0
@@ -56764,6 +56786,7 @@ Streaming.SetAreaVisible(0)
 Blip.Remove($spray_shop1)
 Streaming.LoadSpecialCharacter('RYDER2', 1)
 Streaming.RequestModel(600)
+Streaming.RequestModel(492)
 Streaming.RequestModel(#CIGAR)
 Streaming.RequestModel(#CIGAR_GLOW)
 Streaming.LoadAllModelsNow
@@ -56771,6 +56794,7 @@ Streaming.LoadAllModelsNow
 :INTRO2_1352
 if or
   not Streaming.HasModelLoaded(600)
+  not Streaming.HasModelLoaded(492)
   not Streaming.HasModelLoaded(#CIGAR)
   not Streaming.HasModelLoaded(#CIGAR_GLOW)
   not Streaming.HasSpecialCharacterLoaded(1)
@@ -56779,16 +56803,20 @@ wait 0
 goto @INTRO2_1352
 
 :INTRO2_1391
+200@ = Car.Create(492, $sweet_carX, $sweet_carY, $sweet_carZ)
+Car.SetHeading(200@, $sweet_carH)
+Car.ChangeColor(200@, 59, 34)
+
 World.SwitchEntryExit('BARBERS', False)
 World.SwitchEntryExit('BARBER2', False)
 World.SwitchEntryExit('BARBER3', False)
 World.SwitchEntryExit('FDPIZA', False)
 World.SwitchEntryExit('FDCHICK', False)
 World.SwitchEntryExit('FDBURG', False)
+
 Char.ClearTasks($scplayer)
 Char.ClearTasksImmediately($scplayer)
-CarGenerator.Switch($gen_car6, 0)
-World.ClearArea(1, $ryder_carX, $ryder_carY, $ryder_carZ, 6.0)
+
 Car.CustomPlateForNextCar(600, "_SHERM__")
 $ryder_car = Car.Create(600, $ryder_carX, $ryder_carY, $ryder_carZ)
 Car.SetCanBurstTires($ryder_car, False)
@@ -56797,6 +56825,23 @@ Car.SetHeading($ryder_car, 0.0)
 Car.SetCanBeVisiblyDamaged($ryder_car, False)
 Audio.SetRadioChannel(RadioChannel.RadioLosSantos)
 $ryder = Char.Create(24, 290, 2475.29, -1687.85, 12.51)
+
+// waiting for the server to create the vehicles
+while true
+    wait 0
+    $temp_int = Coop.GetVehicleNetworkId(200@)
+    67@ = Coop.GetVehicleNetworkId($ryder_car)
+    37@ = Coop.GetPedNetworkId($ryder)
+    
+    if and
+        $temp_int <> -1  
+        67@ <> -1  
+        37@ <> -1
+    then
+        break
+    end
+end
+
 67@ = DecisionMakerChar.Load(DecisionMakerType.Empty)
 Char.SetDecisionMaker($ryder, 67@)
 Char.SetAnimGroup($ryder, "GANG1")
@@ -56818,6 +56863,40 @@ Audio.LoadMissionAudio(20200, 1)
 Char.ClearTasksImmediately($scplayer)
 Char.SetCoordinates($scplayer, 2464.03, -1687.61, 12.51)
 Char.SetHeading($scplayer, 252.27)
+
+if
+    Coop.IsNetworkPlayerActorValid($NETWORK_PLAYER[0])
+then
+    Char.ClearTasksImmediately($NETWORK_PLAYER[0])
+    Char.SetCoordinates($NETWORK_PLAYER[0], 2463.76, -1684.55, 13.53)
+    Char.SetHeading($NETWORK_PLAYER[0], 248.93)
+end
+
+if
+    Coop.IsNetworkPlayerActorValid($NETWORK_PLAYER[1])
+then
+    Char.ClearTasksImmediately($NETWORK_PLAYER[1])
+    Char.SetCoordinates($NETWORK_PLAYER[1], 2464.51, -1682.21, 13.52)
+    Char.SetHeading($NETWORK_PLAYER[1], 230.52)
+end
+
+if
+    Coop.IsNetworkPlayerActorValid($NETWORK_PLAYER[2])
+then
+    Char.ClearTasksImmediately($NETWORK_PLAYER[2])
+    Char.SetCoordinates($NETWORK_PLAYER[2], 2466.36, -1680.31, 13.51)
+    Char.SetHeading($NETWORK_PLAYER[2], 219.66)
+end
+
+for $temp_int = 0 to 2
+    if
+        Coop.IsNetworkPlayerActorValid($NETWORK_PLAYER[$temp_int])
+    then
+        201@($temp_int,3i) = 0
+        Coop.UpdateCarBlipForNetworkPlayer($NETWORK_PLAYER[$temp_int], 200@, true, BlipDisplay.MarkerOnly, BlipColor.Blue, 3)
+    end
+end
+
 Streaming.SetAreaVisible(0)
 Streaming.LoadScene(2464.03, -1687.61, 12.51)
 Hud.SwitchWidescreen(False)
@@ -56860,6 +56939,14 @@ goto @INTRO2_1874
 :INTRO2_1978
 Audio.PlayMissionAudio(MissionAudioSlot.Slot1)
 Text.PrintNow('INT2_AA', 10000, 1)
+
+for $temp_int = 0 to 2
+    if 
+        Coop.IsNetworkPlayerActorValid($NETWORK_PLAYER[$temp_int])
+    then
+        Coop.PrintNowForNetworkPlayer('INT2_AA', 10000, 1, $NETWORK_PLAYER[$temp_int])
+    end
+end
 
 :INTRO2_1998
 if 
@@ -56908,11 +56995,26 @@ goto @INTRO2_13667
 $flag_player_on_menace_mission = 1
 
 :INTRO2_2256
+
+150@ = 1
+FOR $temp_int = 0 to 2
+    if
+        Coop.IsNetworkPlayerActorValid($NETWORK_PLAYER[$temp_int])
+    then
+        if not Char.LocateAnyMeans3D($NETWORK_PLAYER[$temp_int], 0, 2077.84, -1792.59, 12.38, 12.0, 12.0, 12.0)
+        then
+            150@ = 0
+            Break
+        end
+    end
+end
+
 if or
   not Car.Locate3D($ryder_car, $blob_flag, 2077.84, -1792.59, 12.38, 4.0, 4.0, 4.0)
   not Char.IsSittingInCar($scplayer, $ryder_car)
   not Char.IsInCar($ryder, $ryder_car)
   not Car.IsOnAllWheels($ryder_car)
+  150@ == 0
 goto_if_false @INTRO2_2886
 wait 0
 if 
@@ -56921,13 +57023,43 @@ goto_if_false @INTRO2_2352
 goto @INTRO2_13692
 
 :INTRO2_2352
+
+
+for $temp_int = 0 to 2
+    if
+        Coop.IsNetworkPlayerActorValid($NETWORK_PLAYER[$temp_int])
+    then
+        
+        if // clear blip on the Greenwood, if its not interesting for player
+            201@($temp_int,3i) == 0
+        then
+            if or
+                Car.IsDead(200@)
+                Char.IsInAnyCar($NETWORK_PLAYER[$temp_int])
+                not Char.LocateOnFootCar3D($NETWORK_PLAYER[$temp_int], 200@, 100.0, 100.0, 100.0, false)
+            then
+                201@($temp_int,3i) = 1
+                Coop.RemoveCarBlipForNetworkPlayer($NETWORK_PLAYER[$temp_int], 200@)
+            end
+        end
+        
+        if and
+            204@($temp_int, 3i) == 0
+            Char.LocateAnyMeans3D($NETWORK_PLAYER[$temp_int], 0, 2077.84, -1792.59, 12.38, 15.0, 15.0, 4.0)
+        then
+            Coop.PrintHelpForNetworkPlayer('HELP44B', $NETWORK_PLAYER[$temp_int])
+            204@($temp_int,3i) = 1
+        end
+    end     
+end
+
 if 
   48@ == 0
 goto_if_false @INTRO2_2436
 if 
   Char.LocateAnyMeans3D($scplayer, 0, 2077.84, -1792.59, 12.38, 15.0, 15.0, 4.0)
 goto_if_false @INTRO2_2436
-Text.PrintHelp('HELP44B')
+Text.PrintHelp('HELP44B') // Drive your vehicle onto the red marker.
 48@ = 1
 
 :INTRO2_2436
@@ -56956,6 +57088,15 @@ Blip.Remove(37@)
 Blip.Remove(34@)
 34@ = Blip.AddForCoord(2077.84, -1792.59, 12.56)
 $blob_flag = 1
+
+FOR $temp_int = 0 to 2
+    if
+        Coop.IsNetworkPlayerActorValid($NETWORK_PLAYER[$temp_int])
+    then
+        Coop.UpdateCheckpointForNetworkPlayer(2077.84, -1792.59, 12.38, 4.0, 4.0, 4.0, $NETWORK_PLAYER[$temp_int])
+    end
+end
+
 Text.PrintNow('HOOD2_A', 6000, 1)
 TIMERB = 0
 38@ = 1
@@ -56972,6 +57113,15 @@ Blip.Remove(37@)
 37@ = Blip.AddForCar($ryder_car)
 Blip.SetAsFriendly(37@, True)
 $blob_flag = 0
+
+FOR $temp_int = 0 to 2
+    if
+        Coop.IsNetworkPlayerActorValid($NETWORK_PLAYER[$temp_int])
+    then
+        Coop.RemoveCheckpointForNetworkPlayer($NETWORK_PLAYER[$temp_int])
+    end
+end
+
 gosub @INTRO2_15117
 Text.PrintNow('INT2_6', 6000, 1)
 Char.ShutUpForScriptedSpeech($scplayer, False)
@@ -57071,6 +57221,14 @@ Hud.SwitchWidescreen(False)
 Player.SetControl($player1, True)
 Camera.SetBehindPlayer
 Camera.RestoreJumpcut
+
+FOR $temp_int = 0 to 2
+    if
+        Coop.IsNetworkPlayerActorValid($NETWORK_PLAYER[$temp_int])
+    then
+        Coop.RemoveCheckpointForNetworkPlayer($NETWORK_PLAYER[$temp_int])
+    end
+end
 Blip.Remove(34@)
 34@ = Blip.AddForCoord(413.6397, -19.9389, 1000.812)
 Blip.SetEntryExit(34@, 2073.042, -1794.563, 20.0)
@@ -58797,6 +58955,15 @@ goto @INTRO2_13692
 :INTRO2_13667
 Text.PrintBig('M_FAIL', 5000, TextStyle.Middle)
 $can_skip_smoking_cutscene = 1
+
+for $temp_int = 0 to 2
+    if 
+        Coop.IsNetworkPlayerActorValid($NETWORK_PLAYER[$temp_int])
+    then
+        Coop.ClearAllEntityBlipsForNetworkPlayer($NETWORK_PLAYER[$temp_int])
+    end
+end
+
 return 
 
 :INTRO2_13692
@@ -58813,6 +58980,14 @@ start_new_script @SWEET
 Blip.Remove($sweet_contact_blip)
 
 $sweet_contact_blip = Blip.AddSpriteForContactPoint($sweet_blip_icon, $sweetX, $sweetY, $sweetZ)
+
+for $temp_int = 0 to 2
+    if 
+        Coop.IsNetworkPlayerActorValid($NETWORK_PLAYER[$temp_int])
+    then
+        Coop.ClearAllEntityBlipsForNetworkPlayer($NETWORK_PLAYER[$temp_int])
+    end
+end
 
 Player.ClearWantedLevel($player1)
 World.SwitchEntryExit('BARBERS', True)
@@ -58890,6 +59065,15 @@ goto_if_false @INTRO2_14875
 Car.SetCanBurstTires($ryder_car, True)
 
 :INTRO2_14875
+
+for $temp_int = 0 to 2
+    if 
+        Coop.IsNetworkPlayerActorValid($NETWORK_PLAYER[$temp_int])
+    then
+        Coop.ClearAllEntityBlipsForNetworkPlayer($NETWORK_PLAYER[$temp_int])
+    end
+end
+
 Streaming.MarkModelAsNoLongerNeeded(155)
 Streaming.MarkModelAsNoLongerNeeded(600)
 Streaming.MarkModelAsNoLongerNeeded(346)
