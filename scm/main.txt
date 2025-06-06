@@ -513399,7 +513399,18 @@ $tattoo_needleZ += 1.0
 set_var_float_to_var_float $tattoo_needle_heading = $shop_keep_heading_tattoo
 Text.UseCommands(True)
 Stat.ShowUpdateStats(False)
-$shop_keep_tattoo = Char.Create(4, $shopkeeper_model_shops, $shop_keep_tattooX, $shop_keep_tattooY, $shop_keep_tattooZ)
+
+
+$shop_keep_tattoo = Coop.GetPedInAreaWithModel($shop_keep_tattooX, $shop_keep_tattooY, $shop_keep_tattooZ, 4.0, 4.0, 40.0, $shopkeeper_model_shops, -1, -1)
+
+if $shop_keep_tattoo == -1
+then
+    $shop_keep_tattoo = Char.Create(4, $shopkeeper_model_shops, $shop_keep_tattooX, $shop_keep_tattooY, $shop_keep_tattooZ)
+else
+    Coop.ClaimPedOnRelease($shop_keep_tattoo)
+end
+
+
 Char.SetOnlyDamagedByPlayer($shop_keep_tattoo, True)
 Char.SetDecisionMaker($shop_keep_tattoo, 65542)
 Char.SetHeading($shop_keep_tattoo, $shop_keep_heading_tattoo)
@@ -514459,7 +514470,15 @@ Char.DetachFromCar($shop_keep_tattoo)
 :TATTO_8140
 Object.Delete($tattoo_needle)
 Streaming.MarkModelAsNoLongerNeeded(#TATTOO_KIT)
-Char.Delete($shop_keep_tattoo)
+
+if 
+    Coop.IsSyncingThisPed($shop_keep_tattoo)
+then
+    Char.Delete($shop_keep_tattoo)
+else
+    Coop.CancelPedClaim($shop_keep_tattoo)
+end
+
 Streaming.MarkModelAsNoLongerNeeded($shopkeeper_model_shops)
 Txd.Remove
 Text.UseCommands(False)
@@ -515564,7 +515583,16 @@ $walk2_offY_barbers = -23.3
 add_float_var_to_float_var $walk2_offY_barbers += $barber_shop_offsetY
 $walk2_offZ_barbers = 1000.836
 add_float_var_to_float_var $walk2_offZ_barbers += $barber_shop_offsetZ
-$shop_keep_barbers = Char.Create(4, $shopkeeper_model_shops, $barberX, $barberY, $barberZ)
+
+$shop_keep_barbers = Coop.GetPedInAreaWithModel($barberX, $barberY, $barberZ, 4.0, 4.0, 40.0, 156, 177, 176) // barber models
+
+if $shop_keep_barbers == -1
+then
+    $shop_keep_barbers = Char.Create(4, $shopkeeper_model_shops, $barberX, $barberY, $barberZ)
+else
+    Coop.ClaimPedOnRelease($shop_keep_barbers)
+end
+
 Char.SetHeading($shop_keep_barbers, $barber_heading)
 Char.SetDecisionMaker($shop_keep_barbers, 65542)
 Char.SetOnlyDamagedByPlayer($shop_keep_barbers, True)
@@ -516496,7 +516524,13 @@ $flag_restored_camera_barbers = 0
 Sequence.Clear($barber_movein_barbers)
 Sequence.Clear($player_walk_barbers)
 Streaming.MarkModelAsNoLongerNeeded($shopkeeper_model_shops)
-Char.Delete($shop_keep_barbers)
+if 
+    Coop.IsSyncingThisPed($shop_keep_barbers)
+then
+    Char.Delete($shop_keep_barbers)
+else
+    Coop.CancelPedClaim($shop_keep_barbers)
+end
 Hud.DisplayRadar(True)
 Text.UseCommands(False)
 Stat.ShowUpdateStats(True)
