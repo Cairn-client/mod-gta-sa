@@ -499394,7 +499394,7 @@ Sequence.Close(8@)
 9@ = Attractor.Add(3@, 4@, 5@, 6@, 7@, 8@)
 
 // 3@, 4@, 5@ - xyz, 10@ - ped, 11@ - model
-10@ = Coop.GetPedInAreaWithModel(3@, 4@, 5@, 3.0, 3.0, 40.0, 11@, -1, -1)
+10@ = Coop.GetPedInAreaWithModel(3@, 4@, 5@, 1.5, 1.5, 40.0, 11@, -1, -1)
 
 if 10@ == -1
 then
@@ -520446,6 +520446,11 @@ then
     $shop_keep_junkfud = Char.Create(4, $shopkeeper_model_shops, $junkfudX, $junkfudY, $junkfudZ)
 else
     Coop.ClaimPedOnRelease($shop_keep_junkfud)
+    
+    if Coop.IsHost()
+    then
+        Coop.PedTakeHost($shop_keep_junkfud, True)
+    end
 end
 
 Char.SetHeading($shop_keep_junkfud, $junkfud_heading)
@@ -521438,12 +521443,8 @@ Audio.SetMusicDoesFade(False)
 Camera.DoFade(0, Fade.Out)
 gosub @JFUD_12993
 
-if Coop.IsSyncingThisPed($shop_keep_junkfud)
-then
-    Char.Delete($shop_keep_junkfud)
-else
-    Coop.CancelPedClaim($shop_keep_junkfud)
-end
+Coop.PedResetAllClaims($shop_keep_junkfud)
+Char.Delete($shop_keep_junkfud)
 
 $flag_menace_buyfood = 3
 $cost_menu_drawn_shops = 0
@@ -522035,12 +522036,8 @@ Camera.SetFadingColor(0, 0, 0)
 Camera.DoFade(0, Fade.Out)
 gosub @JFUD_12993
 
-if Coop.IsSyncingThisPed($shop_keep_junkfud)
-then
-    Char.Delete($shop_keep_junkfud)
-else
-    Coop.CancelPedClaim($shop_keep_junkfud)
-end
+Coop.PedResetAllClaims($shop_keep_junkfud)
+Char.Delete($shop_keep_junkfud)
 
 $flag_menace_buyfood = 3
 $created_this_food = 0
