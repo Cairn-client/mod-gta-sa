@@ -57327,6 +57327,38 @@ World.SetPedDensityMultiplier(0.0)
 Camera.SetNearClip(0.2)
 Task.StandStill($scplayer, 10)
 
+
+Streaming.SetAreaVisible(0)
+if 
+    Coop.IsNetworkPlayerActorValid($NETWORK_PLAYER[0])
+then
+    Char.SetCoordinates($NETWORK_PLAYER[0], 2075.8372, -1794.8527, 13.5469)
+    Char.SetHeading($NETWORK_PLAYER[0], 226.2577)
+end
+
+if 
+    Coop.IsNetworkPlayerActorValid($NETWORK_PLAYER[1])
+then
+    Char.SetCoordinates($NETWORK_PLAYER[1], 2074.8403, -1797.6621, 13.5469)
+    Char.SetHeading($NETWORK_PLAYER[1], 277.6862)
+end
+
+if 
+    Coop.IsNetworkPlayerActorValid($NETWORK_PLAYER[2])
+then
+    Char.SetCoordinates($NETWORK_PLAYER[2], 2075.4749, -1799.4458, 13.5469)
+    Char.SetHeading($NETWORK_PLAYER[2], 315.2956)
+end
+
+for $temp_int = 0 to 2
+    if 
+        Coop.IsNetworkPlayerActorValid($NETWORK_PLAYER[$temp_int])
+    then
+        Char.SetAreaVisible($NETWORK_PLAYER[$temp_int], 0)
+        Task.LookAtChar($NETWORK_PLAYER[$temp_int], $ryder, 10000) 
+    end
+end
+
 :INTRO2_3898
 if 
   not Streaming.HasAnimationLoaded("SHOP")
@@ -57837,6 +57869,17 @@ Audio.ClearMissionAudio(MissionAudioSlot.Slot2)
 Text.ClearHelp
 Camera.ResetNewScriptables
 Text.PrintNow('HOOD2_B', 10000, 1)
+
+for $temp_int = 0 to 2
+    if 
+        Coop.IsNetworkPlayerActorValid($NETWORK_PLAYER[$temp_int])
+    then
+        Coop.PrintNowForNetworkPlayer('HOOD2_B', 10000, 1, $NETWORK_PLAYER[$temp_int])
+        Char.ClearTasksImmediately($NETWORK_PLAYER[$temp_int])
+    end
+end
+
+
 Hud.SwitchWidescreen(False)
 Camera.SetBehindPlayer
 Camera.RestoreJumpcut
@@ -58524,6 +58567,35 @@ Char.SetCoordinates($scplayer, 2102.21, -1806.65, 12.4)
 Char.SetHeading($scplayer, 75.0)
 Char.SetCantBeDraggedOut($scplayer, True)
 Char.SetAreaVisible($scplayer, 0)
+
+if 
+    Coop.IsNetworkPlayerActorValid($NETWORK_PLAYER[0])
+then
+    Char.SetCoordinates($NETWORK_PLAYER[0], 2102.21, -1805.65, 12.4)
+end
+
+if 
+    Coop.IsNetworkPlayerActorValid($NETWORK_PLAYER[1])
+then
+    Char.SetCoordinates($NETWORK_PLAYER[1], 2102.21, -1804.65, 12.4)
+end
+
+if 
+    Coop.IsNetworkPlayerActorValid($NETWORK_PLAYER[2])
+then
+    Char.SetCoordinates($NETWORK_PLAYER[2], 2102.21, -1803.65, 12.4)
+end
+    
+for $temp_int = 0 to 2
+    if 
+        Coop.IsNetworkPlayerActorValid($NETWORK_PLAYER[$temp_int])
+    then
+        Task.StandStill($NETWORK_PLAYER[$temp_int], 0)
+        Char.SetHeading($NETWORK_PLAYER[$temp_int], 75.0)
+        Char.SetAreaVisible($NETWORK_PLAYER[$temp_int], 0)
+    end
+end
+
 wait 0
 if 
   not Char.IsDead($ryder)
@@ -59340,6 +59412,15 @@ if
   Audio.HasMissionAudioLoaded(MissionAudioSlot.Slot1)
 goto_if_false @INTRO2_16278
 Text.PrintNow($intro2_chat(49@,17s), 4000, 1)
+
+for $temp_int = 0 to 2
+    if 
+        Coop.IsNetworkPlayerActorValid($NETWORK_PLAYER[$temp_int])
+    then
+        Coop.PrintNowForNetworkPlayer($intro2_chat(49@,17s), 4000, 1, $NETWORK_PLAYER[$temp_int])
+    end
+end
+
 Audio.PlayMissionAudio(MissionAudioSlot.Slot1)
 gosub @INTRO2_16280
 56@ = 2
