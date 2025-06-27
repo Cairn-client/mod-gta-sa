@@ -56709,6 +56709,19 @@ return
 Stat.RegisterMissionGiven
 $NETWORK_PLAYER[0], $NETWORK_PLAYER[1], $NETWORK_PLAYER[2] = Coop.CollectNetworkPlayersForTheMission()
 
+// store hair style for all players
+for $temp_int = 0 to 2
+    if
+        Coop.IsNetworkPlayerActorValid($NETWORK_PLAYER[$temp_int])
+    then
+        219@ = Coop.GetNetworkPlayerInternalId($NETWORK_PLAYER[$temp_int])
+        226@, 227@ = Player.GetClothesItem(219@, BodyPart.Head)
+        0085: 220@($temp_int, 3i) = 226@ 
+        0085: 223@($temp_int, 3i) = 227@
+    end
+end
+
+
 CarGenerator.Switch($gen_car6, 0)
 CarGenerator.Switch($gen_car7, 0)
 World.ClearArea(1, $ryder_carX, $ryder_carY, $ryder_carZ, 10.0)
@@ -57165,6 +57178,7 @@ Hud.SwitchWidescreen(True)
 Player.SetControl($player1, False)
 Text.ClearHelp
 World.SwitchEntryExit('BARBERS', True)
+
 Camera.SetFixedPosition(2086.424, -1783.578, 16.9391, 0.0, 0.0, 0.0)
 Camera.PointAtPoint(2085.603, -1784.143, 16.8617, SwitchType.JumpCut)
 TIMERB = 0
@@ -57232,12 +57246,33 @@ end
 Blip.Remove(34@)
 34@ = Blip.AddForCoord(413.6397, -19.9389, 1000.812)
 Blip.SetEntryExit(34@, 2073.042, -1794.563, 20.0)
+
 $flag_changed_hair_intro2 = 0
 
+
 :INTRO2_3298
+
+228@ = True // haircutsChanged
+
+for $temp_int = 0 to 2
+    if
+        Coop.IsNetworkPlayerActorValid($NETWORK_PLAYER[$temp_int])
+    then
+        219@ = Coop.GetNetworkPlayerInternalId($NETWORK_PLAYER[$temp_int])
+        226@, 227@ = Player.GetClothesItem(219@, BodyPart.Head)
+        if and
+            003B: 220@($temp_int,3i) == 226@ 
+            003B: 223@($temp_int,3i) == 227@ 
+        then
+            228@ = False // haircutsChanged = False
+        end
+    end
+end
+
 if or
   $flag_changed_hair_intro2 == 0
   not Char.LocateOnFoot3D($scplayer, 0, 2072.11, -1793.8, 12.56, 10.0, 10.0, 3.0)
+  228@ == False // haircutsChanged
 goto_if_false @INTRO2_3809
 wait 0
 if 
@@ -58497,6 +58532,15 @@ Path.FlushRoute
 Path.ExtendRoute(372.0, -120.1, 1000.5)
 Path.ExtendRoute(370.5, -132.3, 1000.4)
 Task.FollowPointRoute($scplayer, 6, RouteMode.Once)
+
+for $temp_int = 0 to 2
+    if 
+        Coop.IsNetworkPlayerActorValid($NETWORK_PLAYER[$temp_int])
+    then
+        Task.GoToCoordAnyMeans($NETWORK_PLAYER[$temp_int], 372.422, -132.1289, 1001.4922, 6, -1)
+    end
+end
+
 Path.FlushRoute
 Path.ExtendRoute(376.3, -121.0, 1000.5)
 Path.ExtendRoute(375.9, -132.0, 1000.5)
@@ -515694,15 +515738,18 @@ end
 Char.SetHeading($shop_keep_barbers, $barber_heading)
 Char.SetDecisionMaker($shop_keep_barbers, 65542)
 Char.SetOnlyDamagedByPlayer($shop_keep_barbers, True)
+
 $barber_movein_barbers = Sequence.Open()
-Task.PlayAnimNonInterruptable(-1, "BRB_IN", "HAIRCUTS", 4.0, False, False, False, False, -1)
-Task.PlayAnimNonInterruptable(-1, "BRB_LOOP", "HAIRCUTS", 4.0, True, False, False, False, -1)
+    Task.PlayAnimNonInterruptable(-1, "BRB_IN", "HAIRCUTS", 4.0, False, False, False, False, -1)
+    Task.PlayAnimNonInterruptable(-1, "BRB_LOOP", "HAIRCUTS", 4.0, True, False, False, False, -1)
 Sequence.Close($barber_movein_barbers)
+
 $player_walk_barbers = Sequence.Open()
-Task.GoStraightToCoord(-1, $walk_offX_barbers, $walk_offY_barbers, $walk_offZ_barbers, MoveState.Walk, 8000)
-Task.GoStraightToCoord(-1, $walk2_offX_barbers, $walk2_offY_barbers, $walk2_offZ_barbers, MoveState.Walk, 8000)
-Task.AchieveHeading(-1, 180.0)
+    Task.GoStraightToCoord(-1, $walk_offX_barbers, $walk_offY_barbers, $walk_offZ_barbers, MoveState.Walk, 8000)
+    //Task.GoStraightToCoord(-1, $walk2_offX_barbers, $walk2_offY_barbers, $walk2_offZ_barbers, MoveState.Walk, 8000)
+    //Task.AchieveHeading(-1, 180.0)
 Sequence.Close($player_walk_barbers)
+
 $control_flag_barbers = 0
 $flag_barber = 2
 
