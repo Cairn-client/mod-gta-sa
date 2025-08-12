@@ -57463,6 +57463,32 @@ Task.PlayAnim($ryder, "SMOKE_RYD", "SHOP", 4.0, True, False, False, False, -1)
 if 
   not Car.IsDead($ryder_car)
 goto_if_false @INTRO2_4340
+
+/// Greenwood near to the pizza rest
+World.ClearArea(2095.52, -1799.78, 13.06, 5.0, 0)
+if Car.IsDead(200@) 
+then
+    200@ = Car.Create(492, 2095.52, -1799.78, 13.06)
+    
+    while true
+        wait 0
+        $temp_int = Coop.GetVehicleNetworkId(200@)
+        
+        if and
+            $temp_int <> -1  
+        then
+            break
+        end
+    end
+    
+    Car.ChangeColor(200@, 59, 34)
+else
+    Car.SetCoordinates(200@, 2095.52, -1799.78, 13.06)
+end
+
+Car.SetHeading(200@, 270.00)
+///
+
 World.ClearArea(1, 2078.09, -1796.21, 12.3828, 100.0)
 Car.SetCoordinates($ryder_car, 2078.09, -1796.21, 12.3828)
 Car.SetHeading($ryder_car, 176.9536)
@@ -58658,36 +58684,16 @@ Char.SetHeading($scplayer, 75.0)
 Char.SetCantBeDraggedOut($scplayer, True)
 Char.SetAreaVisible($scplayer, 0)
 
-
-World.ClearArea(2095.52, -1799.78, 13.06, 5.0, 0)
-if Car.IsDead(200@) 
+if
+    not Car.IsDead(200@)
 then
-    200@ = Car.Create(492, 2095.52, -1799.78, 13.06)
-    
-    while true
-        wait 0
-        $temp_int = Coop.GetVehicleNetworkId(200@)
-        
-        if and
-            $temp_int <> -1  
+    for $temp_int = 0 to 2
+        if
+            Coop.IsNetworkPlayerActorValid($NETWORK_PLAYER[$temp_int])
         then
-            break
+            201@($temp_int,3i) = 0
+            Coop.UpdateCarBlipForNetworkPlayer($NETWORK_PLAYER[$temp_int], 200@, true, BlipDisplay.MarkerOnly, BlipColor.Blue, 3)
         end
-    end
-    
-    Car.ChangeColor(200@, 59, 34)
-else
-    Car.SetCoordinates(200@, 2095.52, -1799.78, 13.06)
-end
-
-Car.SetHeading(200@, 270.00)
-
-for $temp_int = 0 to 2
-    if
-        Coop.IsNetworkPlayerActorValid($NETWORK_PLAYER[$temp_int])
-    then
-        201@($temp_int,3i) = 0
-        Coop.UpdateCarBlipForNetworkPlayer($NETWORK_PLAYER[$temp_int], 200@, true, BlipDisplay.MarkerOnly, BlipColor.Blue, 3)
     end
 end
 
