@@ -52749,6 +52749,7 @@ FOR $temp_int = 0 to 2
     Char.ClearTasks($NETWORK_PLAYER[$temp_int])
     Char.ClearTasksImmediately($NETWORK_PLAYER[$temp_int])
     Char.SetCoordinates($NETWORK_PLAYER[$temp_int], 2509.619, -1679.898, 13.5469)
+    Char.SetAreaVisible($NETWORK_PLAYER[$temp_int], 0)
   end
 end
 
