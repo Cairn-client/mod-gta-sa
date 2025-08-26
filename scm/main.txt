@@ -612,8 +612,6 @@ DEFINE UNKNOWN_THREADS_MEMORY 574
 
 {$USE CoopAndreas}
 {$USE debug}
-{$USE CLEO}
-{$USE CLEO+}
 
 var
 $NETWORK_PLAYER: array 3 of integer
@@ -53777,20 +53775,20 @@ goto_if_false @INTRO1_10022
 wait 0
 
 // SKIP MISSION
-if and
-    Pad.IsKeyPressed(KeyCode.Shift)
-    Pad.IsKeyJustPressed(KeyCode.M)
-then
-    FOR $temp_int = 0 to 2
-        if
-            Coop.IsNetworkPlayerActorValid($NETWORK_PLAYER[$temp_int])
-        then
-            Char.SetCoordinates($NETWORK_PLAYER[$temp_int], 2473.692, -1684.215, 12.4625)
-        end
-    end
-    Char.SetCoordinates($scplayer, 2473.692, -1684.215, 12.4625)
-    goto @INTRO1_19683
-end
+//if and
+//    Pad.IsKeyPressed(KeyCode.Shift)
+//    Pad.IsKeyJustPressed(KeyCode.M)
+//then
+//    FOR $temp_int = 0 to 2
+//        if
+//            Coop.IsNetworkPlayerActorValid($NETWORK_PLAYER[$temp_int])
+//        then
+//            Char.SetCoordinates($NETWORK_PLAYER[$temp_int], 2473.692, -1684.215, 12.4625)
+//        end
+//    end
+//    Char.SetCoordinates($scplayer, 2473.692, -1684.215, 12.4625)
+//    goto @INTRO1_19683
+//end
 //goto @INTRO1_19683
 
 :INTRO1_8223
