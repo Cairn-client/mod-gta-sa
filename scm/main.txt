@@ -59716,6 +59716,8 @@ return
 
 :SWEET1
 script_name 'SWEET1'
+Coop.EnableSyncingThisScript()
+
 gosub @SWEET1_468
 if 
   has_deatharrest_been_executed 
@@ -59769,6 +59771,7 @@ $spray_can_pickup = Pickup.CreateWithAmmo(365, 15, 1000, 2493.52, -1700.83, 14.2
 
 :SWEET1_468
 Stat.RegisterMissionGiven
+$NETWORK_PLAYER[0], $NETWORK_PLAYER[1], $NETWORK_PLAYER[2] = Coop.CollectNetworkPlayersForTheMission()
 $onmission = 1
 wait 0
 Text.LoadMissionText('SWEET1')
@@ -59893,7 +59896,65 @@ Char.SetCoordinates($scplayer, 2516.53, -1671.37, 12.88)
 Char.SetHeading($scplayer, 61.28)
 Char.GiveWeapon($scplayer, WeaponType.SprayCan, 30000)
 Char.SetCurrentWeapon($scplayer, WeaponType.SprayCan)
+
+for $temp_int = 0 to 2
+    if 
+        Coop.IsNetworkPlayerActorValid($NETWORK_PLAYER[$temp_int])
+    then
+        Char.GiveWeapon($NETWORK_PLAYER[$temp_int], WeaponType.SprayCan, 30000)
+        Char.SetCurrentWeapon($NETWORK_PLAYER[$temp_int], WeaponType.SprayCan)
+    end
+end
+
+///
+
+if 
+    Coop.IsNetworkPlayerActorValid($NETWORK_PLAYER[0])
+then
+    Char.SetCoordinates($NETWORK_PLAYER[0], 2514.73, -1667.61, 13.56)
+    Char.SetHeading($NETWORK_PLAYER[0], 93.72)
+end
+
+if 
+    Coop.IsNetworkPlayerActorValid($NETWORK_PLAYER[1])
+then
+    Char.SetCoordinates($NETWORK_PLAYER[1], 2514.50, -1665.78, 13.58)
+    Char.SetHeading($NETWORK_PLAYER[1], 102.62)
+end
+
+if 
+    Coop.IsNetworkPlayerActorValid($NETWORK_PLAYER[2])
+then
+    Char.SetCoordinates($NETWORK_PLAYER[2], 2514.08, -1663.51, 13.60)
+    Char.SetHeading($NETWORK_PLAYER[2], 126.37)
+end
+
+///
+
 $sweet = Char.Create(24, 290, 2518.07, -1668.82, 12.85)
+$sweet_car = Car.Create(492, 2508.16, -1666.47, 13.0)
+$big_smoke = Char.Create(24, 299, 2520.1, -1669.58, 13.1)
+
+$temp_int = Coop.GetVehicleNetworkId($sweet_car)
+while $temp_int == -1
+    wait 0
+    $temp_int = Coop.GetVehicleNetworkId($sweet_car)
+end
+
+$temp_int = Coop.GetPedNetworkId($sweet)
+while $temp_int == -1
+    wait 0
+    $temp_int = Coop.GetPedNetworkId($sweet)
+end
+
+$temp_int = Coop.GetPedNetworkId($big_smoke)
+while $temp_int == -1
+    wait 0
+    $temp_int = Coop.GetPedNetworkId($big_smoke)
+end
+
+///
+
 Char.SetAnimGroup($sweet, "GANG2")
 Char.SetHeading($sweet, 103.76)
 72@ = DecisionMakerChar.Load(DecisionMakerType.Empty)
@@ -59910,14 +59971,12 @@ Char.SetGetOutUpsideDownCar($sweet, False)
 CarGenerator.Switch($gen_car7, 0)
 World.ClearArea(1, 2518.07, -1668.82, 12.85, 10.0)
 Car.CustomPlateForNextCar(492, "GROVE4L_")
-$sweet_car = Car.Create(492, 2508.16, -1666.47, 13.0)
 Car.SetCanBurstTires($sweet_car, False)
 Car.ChangeColor($sweet_car, 59, 34)
 Car.SetHeading($sweet_car, 16.0)
 56@ = Blip.AddForCar($sweet_car)
 Blip.SetAsFriendly(56@, True)
 Audio.SetRadioChannel(RadioChannel.BounceFM)
-$big_smoke = Char.Create(24, 299, 2520.1, -1669.58, 13.1)
 Char.SetAnimGroup($big_smoke, "FATMAN")
 Char.SetHeading($big_smoke, 173.99)
 Task.GoStraightToCoord($big_smoke, 2518.509, -1676.124, 13.3855, MoveState.Walk, 10000)
@@ -60146,20 +60205,53 @@ Camera.SetBehindPlayer
 Hud.SwitchWidescreen(False)
 Player.SetControl($player1, True)
 Camera.RestoreJumpcut
+
 Text.PrintNow('SWE1_A', 7000, 1)
+for $temp_int = 0 to 1 // include 2 network players only
+    if 
+        Coop.IsNetworkPlayerActorValid($NETWORK_PLAYER[$temp_int])
+    then
+        Coop.PrintNowForNetworkPlayer('SWE1_A', 7000, 1, $NETWORK_PLAYER[$temp_int]) // Get in Sweets Car
+    end
+end
+
 45@ = 0
 $blob_flag = 0
 if 
   Car.IsDead($sweet_car)
 goto_if_false @SWEET1_3094
+
 Text.PrintNow('SWE1_Q', 10000, 1)
+for $temp_int = 0 to 2
+    if 
+        Coop.IsNetworkPlayerActorValid($NETWORK_PLAYER[$temp_int])
+    then
+        Coop.PrintNowForNetworkPlayer('SWE1_Q', 7000, 1, $NETWORK_PLAYER[$temp_int]) //~r~You destroyed Sweets ride!
+    end
+end
+
 goto @SWEET1_14575
 
 :SWEET1_3094
+
+206@ = 0
+for $temp_int = 0 to 2
+    if 
+        Coop.IsNetworkPlayerActorValid($NETWORK_PLAYER[$temp_int])
+    then
+        if
+            not Char.LocateAnyMeans3D($NETWORK_PLAYER[$temp_int], 0, 2089.01, -1649.08, 12.54, 10.0, 10.0, 10.0)
+        then
+            206@ = 1
+        end
+    end
+end
+
 if or
   not Car.Locate3D($sweet_car, $blob_flag, 2089.01, -1649.08, 12.54, 4.0, 4.0, 4.0)
   not Char.IsSittingInCar($scplayer, $sweet_car)
   not Car.IsOnAllWheels($sweet_car)
+  206@ <> 0
 goto_if_false @SWEET1_3618
 wait 0
 if 
@@ -60172,6 +60264,14 @@ if
   Char.IsDead($sweet)
 goto_if_false @SWEET1_3221
 Text.PrintNow('SWE1_P', 10000, 1)
+for $temp_int = 0 to 2
+    if 
+        Coop.IsNetworkPlayerActorValid($NETWORK_PLAYER[$temp_int])
+    then
+        Coop.PrintNowForNetworkPlayer('SWE1_P', 10000, 1, $NETWORK_PLAYER[$temp_int]) //~r~Sweet is dead!
+    end
+end
+
 goto @SWEET1_14575
 
 :SWEET1_3221
@@ -60183,41 +60283,88 @@ goto @SWEET1_14575
 
 :SWEET1_3262
 if 
-  Car.IsDead($sweet_car)
-goto_if_false @SWEET1_3308
-Text.PrintNow('SWE1_Q', 10000, 1)
-goto @SWEET1_14575
-goto @SWEET1_3492
-
-:SWEET1_3308
-if 
-  Char.IsInCar($scplayer, $sweet_car)
-goto_if_false @SWEET1_3412
-if 
-  34@ == 0
-goto_if_false @SWEET1_3405
-Blip.Remove(56@)
-Blip.Remove(62@)
-62@ = Blip.AddForCoord(2089.01, -1649.08, 12.8)
-Text.PrintNow('HOOD3_A', 5000, 1)
-$blob_flag = 1
-34@ = 1
-
-:SWEET1_3405
-goto @SWEET1_3492
-
-:SWEET1_3412
-if 
-  34@ == 1
-goto_if_false @SWEET1_3492
-Blip.Remove(56@)
-Blip.Remove(62@)
-56@ = Blip.AddForCar($sweet_car)
-Blip.SetAsFriendly(56@, True)
-gosub @SWEET1_15166
-Text.PrintNow('SWE1_S', 5000, 1)
-$blob_flag = 0
-34@ = 0
+    Car.IsDead($sweet_car)
+then
+    Text.PrintNow('SWE1_Q', 10000, 1)
+    for $temp_int = 0 to 2
+        if 
+            Coop.IsNetworkPlayerActorValid($NETWORK_PLAYER[$temp_int])
+        then
+            Coop.PrintNowForNetworkPlayer('SWE1_Q', 7000, 1, $NETWORK_PLAYER[$temp_int]) //~r~You destroyed Sweets ride!
+        end
+    end
+else
+    // === LOCAL PLAYER
+    if 
+        Char.IsInCar($scplayer, $sweet_car)
+    then //goto_if_false @SWEET1_3412
+        if 
+            34@ == 0 // sweet_car_blip_removed
+        then
+            Blip.Remove(56@)
+            Blip.Remove(62@)
+            62@ = Blip.AddForCoord(2089.01, -1649.08, 12.8)
+            Text.PrintNow('HOOD3_A', 5000, 1) // ~s~Drive with Sweet to ~y~Idlewood~s~.
+            $blob_flag = 1
+            34@ = 1 // sweet_car_blip_removed
+        end
+    else
+        if 
+            34@ == 1 // sweet_car_blip_removed
+        then
+            Blip.Remove(56@)
+            Blip.Remove(62@)
+            56@ = Blip.AddForCar($sweet_car)
+            Blip.SetAsFriendly(56@, True)
+            gosub @SWEET1_15166 // get_back_in_the_car
+            Text.PrintNow('SWE1_S', 5000, 1) //~s~Get back in ~b~Sweets car!
+            $blob_flag = 0
+            34@ = 0 // sweet_car_blip_removed
+        end
+    end
+    
+    /// === NETWORK PLAYERS
+    
+    for $temp_int = 0 to 2
+        if 
+            Coop.IsNetworkPlayerActorValid($NETWORK_PLAYER[$temp_int])
+        then
+            if 
+                Char.IsInCar($NETWORK_PLAYER[$temp_int], $sweet_car)
+            then //goto_if_false @SWEET1_3412
+                if 
+                    200@($temp_int, 3i) == 0 // sweet_car_blip_removed
+                then
+                    if $temp_int == 2 // the 3rd player
+                    then
+                        // TODO
+                    else
+                        Coop.RemoveCarBlipForNetworkPlayer($NETWORK_PLAYER[$temp_int], $sweet_car)
+                    end
+                    
+                    Coop.UpdateCheckpointForNetworkPlayer(2089.01, -1649.08, 12.8, 4.0, 4.0, 4.0, $NETWORK_PLAYER[$temp_int])
+                    Coop.PrintNowForNetworkPlayer('HOOD3_A', 5000, 1, $NETWORK_PLAYER[$temp_int]) // ~s~Drive with Sweet to ~y~Idlewood~s~.
+                    200@($temp_int, 3i) = 1 // sweet_car_blip_removed
+                end
+            else
+                if 
+                    200@($temp_int, 3i) == 1 // sweet_car_blip_removed
+                then
+                    if $temp_int == 2 // the 3rd player
+                    then
+                        // TODO
+                    else
+                        Coop.UpdateCarBlipForNetworkPlayer($NETWORK_PLAYER[$temp_int], $sweet_car, true, BlipDisplay.Both, BlipColor.Purple, 3)
+                    end
+                    
+                    Coop.RemoveCheckpointForNetworkPlayer($NETWORK_PLAYER[$temp_int])
+                    Coop.PrintNowForNetworkPlayer('SWE1_S', 5000, 1, $NETWORK_PLAYER[$temp_int]) //~s~Get back in ~b~Sweets car!
+                    200@($temp_int, 3i) = 0 // sweet_car_blip_removed
+                end
+            end
+        end
+    end
+end
 
 :SWEET1_3492
 if 
@@ -60244,6 +60391,23 @@ goto @SWEET1_14575
 goto @SWEET1_3094
 
 :SWEET1_3618
+
+for $temp_int = 0 to 2
+    if 
+        Coop.IsNetworkPlayerActorValid($NETWORK_PLAYER[$temp_int])
+    then
+        Coop.RemoveCheckpointForNetworkPlayer($NETWORK_PLAYER[$temp_int])
+        if
+            $temp_int == 2
+        then
+            // TODO
+        else
+            Coop.RemoveCarBlipForNetworkPlayer($NETWORK_PLAYER[$temp_int], $sweet_car)
+            200@($temp_int, 3i) = 1
+        end
+    end
+end
+
 Player.SetControl($player1, False)
 Camera.SetFixedPosition(2082.533, -1650.244, 14.8007, 0.0, 0.0, 0.0)
 Camera.PointAtPoint(2083.515, -1650.202, 14.6181, SwitchType.JumpCut)
@@ -60266,6 +60430,7 @@ Char.SetAccuracy($sweet, 90)
 Char.SetShootRate($sweet, 100)
 69@ = 0
 Hud.SwitchWidescreen(True)
+
 if 
   not Char.IsDead($sweet)
 goto_if_false @SWEET1_3901
@@ -60282,6 +60447,20 @@ goto_if_false @SWEET1_3930
 Task.LeaveCar($scplayer, $sweet_car)
 
 :SWEET1_3930
+
+for $temp_int = 0 to 2
+    if 
+        Coop.IsNetworkPlayerActorValid($NETWORK_PLAYER[$temp_int])
+    then
+        wait 100
+        if 
+            Char.IsInAnyCar($NETWORK_PLAYER[$temp_int])
+        then
+            Task.LeaveAnyCar($NETWORK_PLAYER[$temp_int])
+        end
+    end
+end
+
 wait 500
 Camera.DoFade(0, 1000)
 
@@ -60376,6 +60555,14 @@ goto @SWEET1_4417
 :SWEET1_4521
 Audio.PlayMissionAudio(MissionAudioSlot.Slot2)
 Text.PrintNow('SWE1_AR', 10000, 1)
+for $temp_int = 0 to 2
+    if 
+        Coop.IsNetworkPlayerActorValid($NETWORK_PLAYER[$temp_int])
+    then
+        Coop.PrintNowForNetworkPlayer('SWE1_AR', 10000, 1, $NETWORK_PLAYER[$temp_int])
+    end
+end
+
 if 
   not Char.IsDead($sweet)
 goto_if_false @SWEET1_4565
@@ -60592,6 +60779,14 @@ goto @SWEET1_5647
 :SWEET1_5751
 Audio.PlayMissionAudio(MissionAudioSlot.Slot1)
 Text.PrintNow('SWE1_CA', 10000, 1)
+for $temp_int = 0 to 2
+    if 
+        Coop.IsNetworkPlayerActorValid($NETWORK_PLAYER[$temp_int])
+    then
+        Coop.PrintNowForNetworkPlayer('SWE1_CA', 10000, 1, $NETWORK_PLAYER[$temp_int])
+    end
+end
+
 if 
   not Char.IsDead($sweet)
 goto_if_false @SWEET1_5795
@@ -60721,6 +60916,13 @@ if
 goto_if_false @SWEET1_6472
 Audio.PlayMissionAudio(MissionAudioSlot.Slot2)
 Text.PrintNow('SWE1_CB', 2500, 1)
+for $temp_int = 0 to 2
+    if 
+        Coop.IsNetworkPlayerActorValid($NETWORK_PLAYER[$temp_int])
+    then
+        Coop.PrintNowForNetworkPlayer('SWE1_CB', 2500, 1, $NETWORK_PLAYER[$temp_int])
+    end
+end
 65@ = 1
 
 :SWEET1_6472
@@ -60734,6 +60936,13 @@ if
   Audio.HasMissionAudioFinished(MissionAudioSlot.Slot2)
 goto_if_false @SWEET1_6535
 Text.PrintNow('SWE1_X', 6000, 1)
+for $temp_int = 0 to 2
+    if 
+        Coop.IsNetworkPlayerActorValid($NETWORK_PLAYER[$temp_int])
+    then
+        Coop.PrintNowForNetworkPlayer('SWE1_X', 6000, 1, $NETWORK_PLAYER[$temp_int])
+    end
+end
 65@ = 2
 
 :SWEET1_6535
@@ -60813,6 +61022,20 @@ Car.LockDoors($sweet_car, CarLock.Unlocked)
 
 :SWEET1_7011
 Text.PrintNow('SWE1_S', 6000, 1)
+for $temp_int = 0 to 2
+    if 
+        Coop.IsNetworkPlayerActorValid($NETWORK_PLAYER[$temp_int])
+    then
+        if $temp_int == 2 // the 3rd player
+        then
+            // TODO
+        else
+            Coop.UpdateCarBlipForNetworkPlayer($NETWORK_PLAYER[$temp_int], $sweet_car, true, BlipDisplay.Both, BlipColor.Purple, 3)
+        end
+        Coop.PrintNowForNetworkPlayer('SWE1_S', 6000, 1, $NETWORK_PLAYER[$temp_int])
+    end
+end
+
 if 
   Char.IsDead($sweet)
 goto_if_false @SWEET1_7066
@@ -60823,8 +61046,31 @@ goto @SWEET1_14575
 Audio.LoadMissionAudio(37417, 1)
 
 :SWEET1_7075
-if 
+206@ = 0
+for $temp_int = 0 to 2
+    if 
+        Coop.IsNetworkPlayerActorValid($NETWORK_PLAYER[$temp_int])
+    then
+        if $temp_int == 2 // the 3rd player
+        then
+            if
+                not Char.IsInAnyCar($NETWORK_PLAYER[$temp_int])
+            then
+                206@ = 1
+            end
+        else
+            if
+                not Char.IsInCar($NETWORK_PLAYER[$temp_int], $sweet_car)
+            then
+                206@ = 1
+            end
+        end
+    end
+end
+
+if or
   not Char.IsInCar($scplayer, $sweet_car)
+  206@ <> 0
 goto_if_false @SWEET1_7265
 wait 0
 if 
@@ -60862,6 +61108,19 @@ goto @SWEET1_7075
 58@ = 0
 TIMERA = 0
 $blob_flag = 1
+for $temp_int = 0 to 2
+    if 
+        Coop.IsNetworkPlayerActorValid($NETWORK_PLAYER[$temp_int])
+    then
+        if 
+            $temp_int == 2 // the 3rd player
+        then
+            // TODO
+        else
+            Coop.RemoveCarBlipForNetworkPlayer($NETWORK_PLAYER[$temp_int], $sweet_car)
+        end
+    end
+end
 Blip.Remove(56@)
 41@ = Blip.AddForCoord(2338.74, -1500.31, 22.83)
 
@@ -60896,6 +61155,13 @@ goto @SWEET1_7318
 :SWEET1_7463
 Audio.PlayMissionAudio(MissionAudioSlot.Slot1)
 Text.PrintNow('SWE1_AS', 3000, 1)
+for $temp_int = 0 to 2
+    if 
+        Coop.IsNetworkPlayerActorValid($NETWORK_PLAYER[$temp_int])
+    then
+        Coop.PrintNowForNetworkPlayer('SWE1_AS', 3000, 1, $NETWORK_PLAYER[$temp_int])
+    end
+end
 
 :SWEET1_7483
 if 
@@ -60943,10 +61209,24 @@ goto @SWEET1_14575
 TIMERA = 0
 
 :SWEET1_7713
+206@ = 0
+for $temp_int = 0 to 2
+    if 
+        Coop.IsNetworkPlayerActorValid($NETWORK_PLAYER[$temp_int])
+    then
+        if
+            not Char.LocateAnyMeans3D($NETWORK_PLAYER[$temp_int], 0, 2338.74, -1500.31, 22.83, 10.0, 10.0, 10.0)
+        then
+            206@ = 1
+        end
+    end
+end
+
 if or
   not Car.Locate3D($sweet_car, $blob_flag, 2338.74, -1500.31, 22.83, 4.0, 4.0, 4.0)
   not Char.IsSittingInCar($scplayer, $sweet_car)
   not Car.IsOnAllWheels($sweet_car)
+  206@ <> 0
 goto_if_false @SWEET1_8342
 wait 0
 if 
@@ -60974,43 +61254,84 @@ goto @SWEET1_14575
 
 :SWEET1_7914
 if 
-  Car.IsDead($sweet_car)
-goto_if_false @SWEET1_7960
-Text.PrintNow('SWE1_Q', 10000, 1)
-goto @SWEET1_14575
-goto @SWEET1_8156
-
-:SWEET1_7960
-if 
-  Char.IsInCar($scplayer, $sweet_car)
-goto_if_false @SWEET1_8064
-if 
-  34@ == 0
-goto_if_false @SWEET1_8057
-Blip.Remove(41@)
-Blip.Remove(56@)
-41@ = Blip.AddForCoord(2338.74, -1500.31, 22.83)
-Text.PrintNow('HOOD3_B', 5000, 1)
-34@ = 1
-$blob_flag = 1
-
-:SWEET1_8057
-goto @SWEET1_8156
-
-:SWEET1_8064
-if 
-  34@ == 1
-goto_if_false @SWEET1_8156
-Blip.Remove(56@)
-Blip.Remove(41@)
-56@ = Blip.AddForCar($sweet_car)
-Blip.SetAsFriendly(56@, True)
-gosub @SWEET1_15166
-Text.PrintNow('SWE1_S', 6000, 1)
-Char.ShutUpForScriptedSpeech($scplayer, False)
-Char.StopFacialTalk($scplayer)
-$blob_flag = 0
-34@ = 0
+    Car.IsDead($sweet_car)
+then
+    Text.PrintNow('SWE1_Q', 10000, 1)
+    goto @SWEET1_14575 // mission_sweet1_failed
+else
+    /// === LOCAL PLAYER
+    if 
+        Char.IsInCar($scplayer, $sweet_car)
+    then
+        if 
+            34@ == 0
+        then
+            Blip.Remove(41@)
+            Blip.Remove(56@)
+            41@ = Blip.AddForCoord(2338.74, -1500.31, 22.83)
+            Text.PrintNow('HOOD3_B', 5000, 1) // Go into enemy territory and spray over the rival gang tags
+            34@ = 1
+            $blob_flag = 1
+        end
+    else
+        if 
+          34@ == 1
+        then
+            Blip.Remove(56@)
+            Blip.Remove(41@)
+            56@ = Blip.AddForCar($sweet_car)
+            Blip.SetAsFriendly(56@, True)
+            gosub @SWEET1_15166 // get_back_in_the_car
+            Text.PrintNow('SWE1_S', 6000, 1) //~s~Get back in ~b~Sweets car!
+            Char.ShutUpForScriptedSpeech($scplayer, False)
+            Char.StopFacialTalk($scplayer)
+            $blob_flag = 0
+            34@ = 0
+        end
+    end
+    
+    /// === NETWORK PLAYERS
+    
+    for $temp_int = 0 to 2
+        if 
+            Coop.IsNetworkPlayerActorValid($NETWORK_PLAYER[$temp_int])
+        then
+            if 
+                Char.IsInCar($NETWORK_PLAYER[$temp_int], $sweet_car)
+            then //goto_if_false @SWEET1_3412
+                if 
+                    200@($temp_int, 3i) == 0 // sweet_car_blip_removed
+                then
+                    if $temp_int == 2 // the 3rd player
+                    then
+                        // TODO
+                    else
+                        Coop.RemoveCarBlipForNetworkPlayer($NETWORK_PLAYER[$temp_int], $sweet_car)
+                    end
+                    
+                    Coop.UpdateCheckpointForNetworkPlayer(2338.74, -1500.31, 22.83, 4.0, 4.0, 4.0, $NETWORK_PLAYER[$temp_int])
+                    Coop.PrintNowForNetworkPlayer('HOOD3_B', 5000, 1, $NETWORK_PLAYER[$temp_int]) // ~s~Drive with Sweet to ~y~Idlewood~s~.
+                    200@($temp_int, 3i) = 1 // sweet_car_blip_removed
+                end
+            else
+                if 
+                    200@($temp_int, 3i) == 1 // sweet_car_blip_removed
+                then
+                    if $temp_int == 2 // the 3rd player
+                    then
+                        // TODO
+                    else
+                        Coop.UpdateCarBlipForNetworkPlayer($NETWORK_PLAYER[$temp_int], $sweet_car, true, BlipDisplay.Both, BlipColor.Purple, 3)
+                    end
+                    
+                    Coop.RemoveCheckpointForNetworkPlayer($NETWORK_PLAYER[$temp_int])
+                    Coop.PrintNowForNetworkPlayer('SWE1_S', 5000, 1, $NETWORK_PLAYER[$temp_int]) //~s~Get back in ~b~Sweets car!
+                    200@($temp_int, 3i) = 0 // sweet_car_blip_removed
+                end
+            end
+        end
+    end
+end
 
 :SWEET1_8156
 if 
@@ -61020,6 +61341,13 @@ if
   TIMERA > 3000
 goto_if_false @SWEET1_8216
 Text.PrintNow('HOOD3_B', 5000, 1)
+for $temp_int = 0 to 2
+    if 
+        Coop.IsNetworkPlayerActorValid($NETWORK_PLAYER[$temp_int])
+    then
+        Coop.PrintNowForNetworkPlayer('HOOD3_B', 5000, 1, $NETWORK_PLAYER[$temp_int])
+    end
+end
 58@ = 1
 
 :SWEET1_8216
@@ -61058,6 +61386,20 @@ Hud.SwitchWidescreen(True)
 Camera.SetFixedPosition(2329.675, -1499.911, 25.8505, 0.0, 0.0, 0.0)
 Camera.PointAtPoint(2330.653, -1499.926, 25.644, SwitchType.JumpCut)
 Player.SetControl($player1, False)
+
+for $temp_int = 0 to 2
+    if 
+        Coop.IsNetworkPlayerActorValid($NETWORK_PLAYER[$temp_int])
+    then
+        if
+            Char.IsInAnyCar($NETWORK_PLAYER[$temp_int])
+        then
+            wait 100
+            Task.LeaveAnyCar($NETWORK_PLAYER[$temp_int])
+        end
+    end
+end
+
 wait 100
 if 
   not Car.IsDead($sweet_car)
@@ -61091,6 +61433,13 @@ goto @SWEET1_8524
 :SWEET1_8628
 Audio.PlayMissionAudio(MissionAudioSlot.Slot1)
 Text.PrintNow('SWE1_AV', 10000, 1)
+for $temp_int = 0 to 2
+    if 
+        Coop.IsNetworkPlayerActorValid($NETWORK_PLAYER[$temp_int])
+    then
+        Coop.PrintNowForNetworkPlayer('SWE1_AV', 10000, 1, $NETWORK_PLAYER[$temp_int])
+    end
+end
 
 :SWEET1_8648
 if 
@@ -61197,34 +61546,36 @@ goto @SWEET1_10009
 
 :SWEET1_9343
 if 
-  46@ == 0
-goto_if_false @SWEET1_9543
-if 
-  Char.LocateAnyMeans2D($scplayer, 0, 2395.61, -1470.52, 20.0, 17.0)
-goto_if_false @SWEET1_9543
-if 
-  not Char.IsDead(54@)
-goto_if_false @SWEET1_9536
-if 
-  not Char.IsDead(55@)
-goto_if_false @SWEET1_9536
-Hud.SwitchWidescreen(True)
-Player.SetControl($player1, False)
-Camera.SetFixedPosition(2400.384, -1472.208, 23.9349, 0.0, 0.0, 0.0)
-Camera.PointAtPoint(2399.49, -1471.763, 23.988, SwitchType.JumpCut)
-Text.PrintHelp('SWE1_H')
-wait 500
-skip_cutscene_start_internal @SWEET1_9521
-wait 6500
-
-:SWEET1_9521
-skip_cutscene_end 
-Hud.SwitchWidescreen(False)
-Player.SetControl($player1, True)
-Camera.RestoreJumpcut
-
-:SWEET1_9536
-46@ = 1
+    46@ == 0
+then
+    if 
+        Char.LocateAnyMeans2D($scplayer, 0, 2395.61, -1470.52, 20.0, 17.0)
+    then
+        if 
+            not Char.IsDead(54@)
+        then
+            if 
+                not Char.IsDead(55@)
+            then
+                Hud.SwitchWidescreen(True)
+                Player.SetControl($player1, False)
+                Camera.SetFixedPosition(2400.384, -1472.208, 23.9349, 0.0, 0.0, 0.0)
+                Camera.PointAtPoint(2399.49, -1471.763, 23.988, SwitchType.JumpCut)
+                Text.PrintHelp('SWE1_H')
+                Coop.TeleportPlayersToHostSafely($NETWORK_PLAYER[0], $NETWORK_PLAYER[1], $NETWORK_PLAYER[2])
+                wait 500
+                skip_cutscene_start_internal @SWEET1_9521
+                wait 6500
+                :SWEET1_9521
+                skip_cutscene_end 
+                Hud.SwitchWidescreen(False)
+                Player.SetControl($player1, True)
+                Camera.RestoreJumpcut
+            end
+        end
+        46@ = 1
+    end
+end
 
 :SWEET1_9543
 if 
@@ -61264,6 +61615,13 @@ if
 goto_if_false @SWEET1_9775
 Audio.PlayMissionAudio(MissionAudioSlot.Slot1)
 Text.PrintNow('SWE1_BA', 2000, 1)
+for $temp_int = 0 to 2
+    if 
+        Coop.IsNetworkPlayerActorValid($NETWORK_PLAYER[$temp_int])
+    then
+        Coop.PrintNowForNetworkPlayer('SWE1_BA', 2000, 1, $NETWORK_PLAYER[$temp_int])
+    end
+end
 
 :SWEET1_9775
 TIMERA = 0
@@ -61294,6 +61652,13 @@ if
 goto_if_false @SWEET1_9916
 Audio.PlayMissionAudio(MissionAudioSlot.Slot2)
 Text.PrintNow('SWE1_BE', 2000, 1)
+for $temp_int = 0 to 2
+    if 
+        Coop.IsNetworkPlayerActorValid($NETWORK_PLAYER[$temp_int])
+    then
+        Coop.PrintNowForNetworkPlayer('SWE1_BE', 2000, 1, $NETWORK_PLAYER[$temp_int])
+    end
+end
 
 :SWEET1_9916
 46@ = 3
@@ -61390,9 +61755,25 @@ Blip.Remove(44@)
 Blip.Remove(41@)
 41@ = Blip.AddForCoord(2374.0, -1534.1, 23.0)
 Text.PrintNow('SWE1_Z', 5000, 1)
+for $temp_int = 0 to 2
+    if 
+        Coop.IsNetworkPlayerActorValid($NETWORK_PLAYER[$temp_int])
+    then
+        Coop.PrintNowForNetworkPlayer('SWE1_Z', 5000, 1, $NETWORK_PLAYER[$temp_int])
+    end
+end
 World.SetTagStatusInArea(84@, 85@, 86@, 87@, 0)
 $tag_percentage = World.GetPercentageTaggedInArea(85@, 86@, 87@, 84@)
 Streaming.RequestCarRecording(207)
+
+for $temp_int = 0 to 2
+    if 
+        Coop.IsNetworkPlayerActorValid($NETWORK_PLAYER[$temp_int])
+    then
+        200@($temp_int, 3i) = 0
+        Coop.UpdateCheckpointForNetworkPlayer(2374.0, -1534.1, 23.0, 1.4, 1.4, 2.0, $NETWORK_PLAYER[$temp_int])     
+    end
+end
 
 :SWEET1_10477
 if 
@@ -61406,6 +61787,13 @@ if
   TIMERA > 2500
 goto_if_false @SWEET1_10559
 Text.PrintNow('SWE1_M', 6000, 1)
+for $temp_int = 0 to 2
+    if 
+        Coop.IsNetworkPlayerActorValid($NETWORK_PLAYER[$temp_int])
+    then
+        Coop.PrintNowForNetworkPlayer('SWE1_M', 6000, 1, $NETWORK_PLAYER[$temp_int])
+    end
+end
 58@ = 1
 
 :SWEET1_10559
@@ -61416,19 +61804,38 @@ goto_if_false @SWEET1_10599
 Blip.Remove(42@)
 
 :SWEET1_10599
-if 
-  49@ == 0
-goto_if_false @SWEET1_10720
-if 
-  Char.LocateOnFoot3D($scplayer, 1, 2374.0, -1534.1, 23.0, 1.4, 1.4, 2.0)
-goto_if_false @SWEET1_10720
-Text.PrintHelp('JUMPH1')
-Blip.Remove(41@)
-Blip.Remove(42@)
-42@ = Blip.AddForCoord(2395.43, -1551.69, 26.98)
-Blip.ChangeColor(42@, BlipColor.Green)
-49@ = 1
+for $temp_int = 0 to 2
+    if 
+        200@($temp_int, 3i) == 0
+    then
+        if 
+            Coop.IsNetworkPlayerActorValid($NETWORK_PLAYER[$temp_int])
+        then
+            if 
+                Char.LocateOnFoot3D($NETWORK_PLAYER[$temp_int], false, 2374.0, -1534.1, 23.0, 1.4, 1.4, 2.0)
+            then
+                Coop.PrintHelpForNetworkPlayer('JUMPH1', $NETWORK_PLAYER[$temp_int])
+                Coop.RemoveCheckpointForNetworkPlayer($NETWORK_PLAYER[$temp_int])
+                200@($temp_int, 3i) = 1    
+            end       
+        end
+    end
+end
 
+if 
+    49@ == 0
+then
+    if 
+        Char.LocateOnFoot3D($scplayer, 1, 2374.0, -1534.1, 23.0, 1.4, 1.4, 2.0)
+    then
+        Text.PrintHelp('JUMPH1')
+        Blip.Remove(41@)
+        Blip.Remove(42@)
+        42@ = Blip.AddForCoord(2395.43, -1551.69, 26.98)
+        Blip.ChangeColor(42@, BlipColor.Green)
+        49@ = 1
+    end
+end
 :SWEET1_10720
 if and
   Char.LocateOnFoot2D($scplayer, 0, 2352.3, -1552.1, 3.0, 3.0)
@@ -61594,6 +62001,13 @@ Blip.Remove(56@)
 Blip.SetAsFriendly(56@, True)
 
 :SWEET1_11695
+for $temp_int = 0 to 2
+    if 
+        Coop.IsNetworkPlayerActorValid($NETWORK_PLAYER[$temp_int])
+    then
+        Coop.RemoveCheckpointForNetworkPlayer($NETWORK_PLAYER[$temp_int])
+    end
+end
 Player.SetControl($player1, False)
 Text.ClearHelp
 World.ClearArea(1, 2378.323, -1526.153, 23.869, 50.0)
@@ -61674,7 +62088,13 @@ Audio.ReportMissionAudioEventAtCar($sweet_car, 1147)
 :SWEET1_12170
 Audio.PlayMissionAudio(MissionAudioSlot.Slot1)
 Text.PrintNow('SWE1_BH', 10000, 1)
-
+for $temp_int = 0 to 2
+    if 
+        Coop.IsNetworkPlayerActorValid($NETWORK_PLAYER[$temp_int])
+    then
+        Coop.PrintNowForNetworkPlayer('SWE1_BH', 10000, 1, $NETWORK_PLAYER[$temp_int]) // CARL, QUICK, GET IN!
+    end
+end
 :SWEET1_12190
 if 
   not Audio.HasMissionAudioFinished(MissionAudioSlot.Slot1)
@@ -61728,6 +62148,13 @@ Hud.SwitchWidescreen(False)
 Player.SetControl($player1, True)
 Camera.RestoreJumpcut
 Text.PrintNow('SWE1_S', 6000, 1)
+for $temp_int = 0 to 2
+    if 
+        Coop.IsNetworkPlayerActorValid($NETWORK_PLAYER[$temp_int])
+    then
+        Coop.PrintNowForNetworkPlayer('SWE1_S', 6000, 1, $NETWORK_PLAYER[$temp_int]) // //~s~Get back in ~b~Sweets car!
+    end
+end
 Blip.Remove(56@)
 Blip.Remove(41@)
 if 
@@ -61740,10 +62167,23 @@ Blip.SetAsFriendly(56@, True)
 Audio.LoadMissionAudio(38607, 1)
 
 :SWEET1_12488
+206@ = 0
+for $temp_int = 0 to 2
+    if 
+        Coop.IsNetworkPlayerActorValid($NETWORK_PLAYER[$temp_int])
+    then
+        if
+            not Char.LocateAnyMeans3D($NETWORK_PLAYER[$temp_int], 0, 2504.735, -1672.45, 12.3848, 10.0, 10.0, 10.0)
+        then
+            206@ = 1
+        end
+    end
+end
 if or
   not Car.Locate3D($sweet_car, $blob_flag, 2504.735, -1672.45, 12.3848, 4.0, 4.0, 4.0)
   not Char.IsSittingInCar($scplayer, $sweet_car)
   not Car.IsOnAllWheels($sweet_car)
+  206@ <> 0
 goto_if_false @SWEET1_13006
 wait 0
 if 
@@ -61754,60 +62194,96 @@ goto @SWEET1_14575
 
 :SWEET1_12593
 if 
-  Car.IsDead($sweet_car)
-goto_if_false @SWEET1_12639
-Text.PrintNow('SWE1_Q', 10000, 1)
-goto @SWEET1_14575
-goto @SWEET1_12921
+    Car.IsDead($sweet_car)
+then
+    Text.PrintNow('SWE1_Q', 10000, 1)
+    goto @SWEET1_14575 // mission_sweet1_failed
+else
 
-:SWEET1_12639
-if 
-  Char.IsInCar($scplayer, $sweet_car)
-goto_if_false @SWEET1_12829
-if 
-  40@ == 0
-goto_if_false @SWEET1_12725
-if 
-  Audio.HasMissionAudioLoaded(MissionAudioSlot.Slot1)
-goto_if_false @SWEET1_12725
-Audio.PlayMissionAudio(MissionAudioSlot.Slot1)
-Text.PrintNow('SWEX_AH', 3000, 1)
-TIMERA = 0
-40@ = 1
-
-:SWEET1_12725
-if 
-  34@ == 0
-goto_if_false @SWEET1_12822
-Blip.Remove(41@)
-Blip.Remove(56@)
-41@ = Blip.AddForCoord(2504.735, -1672.45, 12.3848)
-if 
-  TIMERA > 3000
-goto_if_false @SWEET1_12815
-Text.PrintNow('SWE1_B', 6000, 1)
-34@ = 1
-
-:SWEET1_12815
-$blob_flag = 1
-
-:SWEET1_12822
-goto @SWEET1_12921
-
-:SWEET1_12829
-if 
-  34@ == 1
-goto_if_false @SWEET1_12921
-Blip.Remove(56@)
-Blip.Remove(41@)
-56@ = Blip.AddForCar($sweet_car)
-Blip.SetAsFriendly(56@, True)
-gosub @SWEET1_15166
-Text.PrintNow('SWE1_S', 6000, 1)
-Char.ShutUpForScriptedSpeech($scplayer, False)
-Char.StopFacialTalk($scplayer)
-$blob_flag = 0
-34@ = 0
+    /// === LOCAL PLAYER
+    if 
+        Char.IsInCar($scplayer, $sweet_car)
+    then
+        if 
+            40@ == 0
+        then
+            if 
+                Audio.HasMissionAudioLoaded(MissionAudioSlot.Slot1)
+            then
+                Audio.PlayMissionAudio(MissionAudioSlot.Slot1)
+                Text.PrintNow('SWEX_AH', 3000, 1)
+                TIMERA = 0
+                40@ = 1
+            end
+        end
+        if 
+            34@ == 0
+        then
+            Blip.Remove(41@)
+            Blip.Remove(56@)
+            41@ = Blip.AddForCoord(2504.735, -1672.45, 12.3848)
+            if 
+                TIMERA > 3000
+            then
+                Text.PrintNow('SWE1_B', 6000, 1)
+                34@ = 1
+            end
+            $blob_flag = 1
+        end
+    else
+        if 
+            34@ == 1
+        then
+            Blip.Remove(56@)
+            Blip.Remove(41@)
+            56@ = Blip.AddForCar($sweet_car)
+            Blip.SetAsFriendly(56@, True)
+            gosub @SWEET1_15166 // get_back_in_the_car
+            Text.PrintNow('SWE1_S', 6000, 1) //~s~Get back in ~b~Sweets car!
+            Char.ShutUpForScriptedSpeech($scplayer, False)
+            Char.StopFacialTalk($scplayer)
+            $blob_flag = 0
+            34@ = 0
+        end
+    end
+    /// === NETWORK PLAYERS
+    for $temp_int = 0 to 2
+        if 
+            Coop.IsNetworkPlayerActorValid($NETWORK_PLAYER[$temp_int])
+        then
+            if 
+                $temp_int == 2 // the 3rd player
+            then
+                // TODO
+            else
+                008B: 203@ = $sweet_car
+            end
+            if 
+                Char.IsInCar($scplayer, 203@)
+            then
+                if 
+                    200@($temp_int, 3i) == 0
+                then
+                    Coop.UpdateCheckpointForNetworkPlayer(2504.735, -1672.45, 12.3848, 4.0, 4.0, 4.0, $NETWORK_PLAYER[$temp_int])
+                    Coop.RemoveCarBlipForNetworkPlayer($NETWORK_PLAYER[$temp_int], 203@)
+                    Coop.PrintNowForNetworkPlayer('SWE1_B', 6000, 1, $NETWORK_PLAYER[$temp_int]) // Go back to Sweets gaff.
+                    200@($temp_int, 3i) = 1
+                end
+            else
+                if 
+                    200@($temp_int, 3i) == 1
+                then
+                    Coop.RemoveCheckpointForNetworkPlayer($NETWORK_PLAYER[$temp_int])
+                    Coop.UpdateCarBlipForNetworkPlayer($NETWORK_PLAYER[$temp_int], 203@, true, BlipDisplay.Both, BlipColor.Purple, 3)
+                    gosub @SWEET1_15166 // get_back_in_the_car
+                    Coop.PrintNowForNetworkPlayer('SWE1_S', 6000, 1, $NETWORK_PLAYER[$temp_int]) //~s~Get back in ~b~Sweets car!
+                    200@($temp_int, 3i) = 0
+                end
+            end
+        end
+    end
+    
+end
 
 :SWEET1_12921
 if 
@@ -61829,6 +62305,20 @@ goto @SWEET1_12488
 :SWEET1_13006
 Hud.SwitchWidescreen(True)
 Player.SetControl($player1, False)
+for $temp_int = 0 to 2
+    if 
+        Coop.IsNetworkPlayerActorValid($NETWORK_PLAYER[$temp_int])
+    then
+        Coop.RemoveCheckpointForNetworkPlayer($NETWORK_PLAYER[$temp_int])
+        if
+            Char.IsInAnyCar($NETWORK_PLAYER[$temp_int])
+        then
+            wait 100
+            Task.LeaveAnyCar($NETWORK_PLAYER[$temp_int])
+        end
+    end
+end
+
 Camera.DoFade(0, 1000)
 
 :SWEET1_13024
@@ -62136,6 +62626,23 @@ return
 
 :SWEET1_14682
 $flag_sweet_mission_counter += 1
+
+for $temp_int = 0 to 2
+    if 
+        Coop.IsNetworkPlayerActorValid($NETWORK_PLAYER[$temp_int])
+    then
+        Coop.RemoveCheckpointForNetworkPlayer($NETWORK_PLAYER[$temp_int])
+        
+        if
+            Char.HasGotWeapon($NETWORK_PLAYER[$temp_int], WeaponType.SprayCan)   
+        then
+            Char.RemoveWeapon(41, $NETWORK_PLAYER[$temp_int])
+        end
+        
+        Char.GiveWeapon($NETWORK_PLAYER[$temp_int], WeaponType.SprayCan, 1000)
+    end
+end
+
 if 
   Char.HasGotWeapon($scplayer, WeaponType.SprayCan)
 goto_if_false @SWEET1_14731
@@ -62363,6 +62870,13 @@ if
   Audio.HasMissionAudioLoaded(MissionAudioSlot.Slot1)
 goto_if_false @SWEET1_15875
 Text.PrintNow($sweet1_chat($sweet1_index,8s), 4000, 1)
+for $temp_int = 0 to 2
+    if 
+        Coop.IsNetworkPlayerActorValid($NETWORK_PLAYER[$temp_int])
+    then
+        Coop.PrintNowForNetworkPlayer($sweet1_chat($sweet1_index,8s), 4000, 1, $NETWORK_PLAYER[$temp_int])
+    end
+end
 Audio.PlayMissionAudio(MissionAudioSlot.Slot1)
 gosub @SWEET1_15877
 $sweet1_audio_is_playing = 2
