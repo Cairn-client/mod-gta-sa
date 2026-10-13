@@ -1,0 +1,45 @@
+{
+  "schema": 1,
+  "id": "gta-sa",
+  "name": "Grand Theft Auto: San Andreas",
+  "developer": "Rockstar Games",
+  "franchise": "Grand Theft Auto",
+  "steamAppId": 12120,
+  "exe": "gta_sa.exe",
+  "description": "Take over San Andreas together. CoopAndreas puts several players in the same game: they walk, drive, fight and explore the same world, with a server that keeps everyone in step. An early alpha.",
+  "accent": "#F2A33C",
+  "images": {
+    "background": "gta-sa.jpg",
+    "logo": "gta-sa-logo.png",
+    "hero": "gta-sa-hero.jpg",
+    "poster": "gta-sa-poster.jpg",
+    "screenshots": [ "gta-sa-shot-1.jpg", "gta-sa-shot-2.jpg" ]
+  },
+  "ownSession": true,
+  "setup": [
+    { "kind": "game-found", "detail": "Cairn has not found the game. The mod needs Grand Theft Auto: San Andreas version 1.0 US: use Locate game and pick gta_sa.exe." },
+    { "kind": "game-file", "path": "eax_orig.dll", "title": "Proxy ready", "detail": "Rename the game's own eax.dll to eax_orig.dll before the mod is installed: the mod puts its own eax.dll in its place and the game still loads the original through it." },
+    { "kind": "mod-installed", "detail": "Download the mod above: Cairn puts it in the game's folder." }
+  ],
+  "hostSteps": [
+    "Make sure the game is version 1.0 US, rename its eax.dll to eax_orig.dll, then download the mod above.",
+    "Start the server: run CoopAndreas\\server.exe from the game's folder and leave it open. It listens on port 6767 (open it for friends).",
+    "Press Play. The mod's own launcher opens and asks for its free beta serial key: follow its instructions (the key is made for your PC), then press Launch CoopAndreas.",
+    "In the game press Start Game, enter a nickname and your server's address (127.0.0.1 on the same PC) and port 6767."
+  ],
+  "joinSteps": [
+    "Make sure the game is version 1.0 US, rename its eax.dll to eax_orig.dll, then download the mod above, the same version as the host's.",
+    "Press Play and enter the mod's free beta serial key in its launcher when it asks, then press Launch CoopAndreas.",
+    "In the game press Start Game, enter a nickname and the host's address and port 6767."
+  ],
+  "features": [
+    { "title": "Sessions", "items": [
+      { "name": "Host and join", "detail": "One player runs the server, everyone connects to it by address. Everyone needs the same version of the mod.", "status": "inTest" },
+      { "name": "Kept up to date", "detail": "Cairn installs the mod in the game's folder and updates it when a new version is released." }
+    ] },
+    { "title": "World", "items": [
+      { "name": "On foot and in vehicles", "detail": "Walking, fighting, weapons, vehicles and passengers are shared between players.", "status": "inTest" },
+      { "name": "Missions and pickups", "detail": "Mission markers are shared; pickups and some mission features are still being worked on.", "status": "planned" }
+    ] }
+  ]
+}
